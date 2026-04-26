@@ -3,6 +3,11 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const { Web3 } = require('web3');
 
+// Fix for "Do not know how to serialize a BigInt" error in Express res.json()
+BigInt.prototype.toJSON = function () {
+  return this.toString();
+};
+
 dotenv.config();
 
 const app = express();
