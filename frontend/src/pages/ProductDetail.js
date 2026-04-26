@@ -29,7 +29,7 @@ function ProductDetail({ web3, account, contract }) {
         manufacturer: productData.manufacturer,
         currentOwner: productData.currentOwner,
         state: stateMap[productData.currentState],
-        stateValue: productData.currentState,
+        stateValue: Number(productData.currentState),
         createdAt: new Date(Number(productData.createdAt) * 1000).toLocaleString()
       });
 

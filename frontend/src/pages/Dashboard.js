@@ -23,7 +23,7 @@ function Dashboard({ web3, account, contract }) {
         manufacturer: p.manufacturer,
         currentOwner: p.currentOwner,
         state: stateMap[p.currentState],
-        stateValue: p.currentState,
+        stateValue: Number(p.currentState),
         createdAt: new Date(Number(p.createdAt) * 1000).toLocaleDateString()
       }));
 
