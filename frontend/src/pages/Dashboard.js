@@ -47,8 +47,29 @@ function Dashboard({ web3, account, contract }) {
 
   return (
     <div>
-      <h1>Supply Chain Dashboard</h1>
-      <p>Track products through the supply chain</p>
+      <div className="page-header">
+        <h1 className="page-title">Supply Chain Control Tower</h1>
+        <p className="page-subtitle">Track each asset as it moves from origin to customer.</p>
+      </div>
+
+      <div className="dashboard-meta">
+        <div className="meta-tile">
+          <div className="meta-label">Total Products</div>
+          <div className="meta-value">{products.length}</div>
+        </div>
+        <div className="meta-tile">
+          <div className="meta-label">Created</div>
+          <div className="meta-value">{products.filter((p) => p.stateValue === 0).length}</div>
+        </div>
+        <div className="meta-tile">
+          <div className="meta-label">In Transit</div>
+          <div className="meta-value">{products.filter((p) => p.stateValue === 1).length}</div>
+        </div>
+        <div className="meta-tile">
+          <div className="meta-label">Completed</div>
+          <div className="meta-value">{products.filter((p) => p.stateValue === 3).length}</div>
+        </div>
+      </div>
 
       {!account ? (
         <div className="card">
@@ -63,14 +84,14 @@ function Dashboard({ web3, account, contract }) {
       ) : (
         <div className="product-grid">
           {products.map((product) => (
-            <Link key={product.id} to={`/product/${product.id}`} style={{ textDecoration: 'none' }}>
+            <Link key={product.id} to={`/product/${product.id}`} className="card-link">
               <div className="product-card">
                 <div className="product-name">{product.name}</div>
                 <div className="product-id">ID: {product.id}</div>
                 <div className={`product-state ${getStateClass(product.state)}`}>
                   {product.state}
                 </div>
-                <div style={{ marginTop: '1rem', fontSize: '0.9rem', color: '#666' }}>
+                <div className="product-date">
                   Created: {product.createdAt}
                 </div>
               </div>

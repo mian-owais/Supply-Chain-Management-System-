@@ -15,18 +15,21 @@ supply-chain-full-stack/
 ## Features
 
 ✅ **Smart Contract**
+
 - Role-based access control (Manufacturer, Distributor, Retailer)
 - Product lifecycle tracking
 - Immutable transaction history
 - Audit trail for transparency
 
 ✅ **Backend API**
+
 - RESTful endpoints for product queries
 - User role verification
 - Contract interaction abstraction
 - CORS enabled for frontend
 
 ✅ **Frontend UI**
+
 - Dashboard with product listing
 - Create new products
 - Track product status updates
@@ -38,28 +41,22 @@ supply-chain-full-stack/
 
 - Node.js (v16+)
 - MetaMask browser extension
-- Sepolia testnet ETH (for gas fees)
 
 ## Setup Instructions
 
-### 1. Deploy Smart Contract
+### 1. Start Local Persistent Blockchain and Deploy Contract
 
 ```bash
 cd contracts
-# Install Hardhat
-npm install -D hardhat
+npm install
+npm run node:persistent
 
-# Initialize Hardhat project
-npx hardhat
-
-# Compile contract
-npx hardhat compile
-
-# Deploy to Sepolia (configure in hardhat.config.js)
-npx hardhat run scripts/deploy.js --network sepolia
+# In another terminal
+cd contracts
+npm run deploy:local
 ```
 
-Copy the deployed contract address and update `.env` files.
+`deploy:local` auto-syncs `.env.local` files in backend and frontend.
 
 ### 2. Start Backend
 
@@ -131,20 +128,25 @@ Retailer Sells Product (Sold)
 ## API Endpoints
 
 ### GET /api/products
+
 Get all products
 
 ### GET /api/products/:id
+
 Get specific product details
 
 ### GET /api/user/:address/role
+
 Get user's assigned role
 
 ### GET /api/health
+
 Health check
 
 ## Team Members
 
 Add your group members' names here:
+
 1. Member 1
 2. Member 2
 3. Member 3

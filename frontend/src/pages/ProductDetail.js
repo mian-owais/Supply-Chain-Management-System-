@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
-function ProductDetail({ web3, account, contract }) {
+function ProductDetail({ account, contract, userRole }) {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [history, setHistory] = useState([]);
@@ -93,17 +93,29 @@ function ProductDetail({ web3, account, contract }) {
   if (loading) return <div className="card">Loading...</div>;
   if (!product) return <div className="card">Product not found</div>;
 
+  const actionByState = {
+    0: { label: 'Ship Product', requiredRole: 'Distributor', onClick: handleShipProduct },
+    1: { label: 'Receive Product', requiredRole: 'Retailer', onClick: handleReceiveProduct },
+    2: { label: 'Sell Product', requiredRole: 'Retailer', onClick: handleSellProduct },
+  };
+  const currentAction = actionByState[product.stateValue];
+
   return (
     <div>
-      <h1>{product.name}</h1>
+      <div className="page-header">
+        <h1 className="page-title">{product.name}</h1>
+        <p className="page-subtitle">Lifecycle visibility and custody transfer actions.</p>
+      </div>
       
       <div className="card">
         <h2>Product Details</h2>
-        <p><strong>ID:</strong> {product.id}</p>
-        <p><strong>Created:</strong> {product.createdAt}</p>
-        <p><strong>Manufacturer:</strong> {product.manufacturer}</p>
-        <p><strong>Current Owner:</strong> {product.currentOwner}</p>
-        <p><strong>Status:</strong> {product.state}</p>
+        <div className="detail-list">
+          <p><strong>ID:</strong> {product.id}</p>
+          <p><strong>Created:</strong> {product.createdAt}</p>
+          <p><strong>Manufacturer:</strong> {product.manufacturer}</p>
+          <p><strong>Current Owner:</strong> {product.currentOwner}</p>
+          <p><strong>Status:</strong> {product.state}</p>
+        </div>
       </div>
 
       <div className="card">
@@ -118,21 +130,19 @@ function ProductDetail({ web3, account, contract }) {
           />
         </div>
         
-        <div style={{ display: 'flex', gap: '1rem' }}>
-          {product.stateValue === 0 && (
-            <button className="btn btn-primary" onClick={handleShipProduct} disabled={txLoading}>
-              {txLoading ? 'Processing...' : 'Ship Product'}
-            </button>
-          )}
-          {product.stateValue === 1 && (
-            <button className="btn btn-primary" onClick={handleReceiveProduct} disabled={txLoading}>
-              {txLoading ? 'Processing...' : 'Receive Product'}
-            </button>
-          )}
-          {product.stateValue === 2 && (
-            <button className="btn btn-primary" onClick={handleSellProduct} disabled={txLoading}>
-              {txLoading ? 'Processing...' : 'Sell Product'}
-            </button>
+        <div className="status-actions">
+          {currentAction ? (
+            userRole === currentAction.requiredRole ? (
+              <button className="btn btn-primary" onClick={currentAction.onClick} disabled={txLoading}>
+                {txLoading ? 'Processing...' : currentAction.label}
+              </button>
+            ) : (
+              <div className="status-hint">
+                Next action is <strong>{currentAction.label}</strong>. Required role: <strong>{currentAction.requiredRole}</strong>.
+              </div>
+            )
+          ) : (
+            <div className="status-hint">No further transitions available. Product lifecycle is complete.</div>
           )}
         </div>
       </div>

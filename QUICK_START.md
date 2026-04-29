@@ -5,27 +5,35 @@
 Open 4 terminals in the project root:
 
 ### Terminal 1: Start Blockchain
+
 ```bash
-cd contracts && npm install && npm run node
+cd contracts && npm install && npm run node:persistent
 ```
+
 Keep this running. You'll see accounts with private keys.
 
 ### Terminal 2: Deploy Contract
+
 ```bash
 cd contracts && npm run deploy:local
 ```
-Copy the contract address from output.
+
+First run deploys a new contract; next runs reuse existing deployment to keep product history.
 
 ### Terminal 3: Backend
+
 ```bash
 cd backend && npm install && npm run dev
 ```
+
 Runs on `http://localhost:5000`
 
 ### Terminal 4: Frontend
+
 ```bash
 cd frontend && npm install && npm start
 ```
+
 Opens `http://localhost:3000`
 
 ## MetaMask Setup (2 Minutes)

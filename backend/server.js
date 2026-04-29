@@ -61,7 +61,9 @@ app.get('/api/products', async (req, res) => {
       });
     }
     
-    res.json(products);
+    res.json(JSON.parse(JSON.stringify(products, (key, value) =>
+      typeof value === 'bigint' ? value.toString() : value
+    )));
   } catch (error) {
     console.error('Error fetching products:', error);
     res.status(500).json({ error: error.message });
@@ -76,10 +78,10 @@ app.get('/api/products/:id', async (req, res) => {
     const product = await contract.methods.getProduct(req.params.id).call();
     const history = await contract.methods.getHistory(req.params.id).call();
 
-    res.json({
+    res.json(JSON.parse(JSON.stringify({
       ...normalizeProduct(product),
       history,
-    });
+    }, (key, value) => typeof value === 'bigint' ? value.toString() : value)));
   } catch (error) {
     console.error('Error fetching product:', error);
     res.status(500).json({ error: error.message });
@@ -91,10 +93,10 @@ app.get('/api/user/:address/role', async (req, res) => {
   try {
     if (!contract) return res.status(400).json({ error: 'Contract not initialized' });
     
-    const role = await contract.methods.getUserRole(req.params.address).call();
-    const roleMap = { 0: 'None', 1: 'Manufacturer', 2: 'Distributor', 3: 'Retailer' };
+    const role = await contract.methods.roles(req.params.address).call();
+    const roleMap = { '0': 'None', '1': 'Manufacturer', '2': 'Distributor', '3': 'Retailer' };
     
-    res.json({ address: req.params.address, role: roleMap[role] });
+    res.json({ address: req.params.address, role: roleMap[role.toString()] || 'None' });
   } catch (error) {
     console.error('Error fetching role:', error);
     res.status(500).json({ error: error.message });

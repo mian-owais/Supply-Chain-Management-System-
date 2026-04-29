@@ -129,9 +129,9 @@ function App() {
         <main className="main-content">
           <Routes>
             <Route path="/" element={<Dashboard web3={web3} account={account} contract={contract} />} />
-            <Route path="/product/:id" element={<ProductDetail web3={web3} account={account} contract={contract} />} />
-            <Route path="/create-product" element={<CreateProduct web3={web3} account={account} contract={contract} />} />
-            <Route path="/manage-roles" element={<ManageRoles web3={web3} account={account} contract={contract} />} />
+            <Route path="/product/:id" element={<ProductDetail account={account} contract={contract} userRole={userRole} />} />
+            <Route path="/create-product" element={<CreateProduct account={account} contract={contract} userRole={userRole} />} />
+            <Route path="/manage-roles" element={<ManageRoles account={account} contract={contract} userRole={userRole} />} />
           </Routes>
         </main>
       </div>

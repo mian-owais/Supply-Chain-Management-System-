@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-function CreateProduct({ web3, account, contract }) {
+function CreateProduct({ account, contract, userRole }) {
   const [productName, setProductName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -31,9 +31,18 @@ function CreateProduct({ web3, account, contract }) {
 
   return (
     <div>
-      <h1>Create New Product</h1>
+      <div className="page-header">
+        <h1 className="page-title">Register New Product</h1>
+        <p className="page-subtitle">Create an immutable on-chain record for a newly manufactured item.</p>
+      </div>
       
-      <div className="card" style={{ maxWidth: '500px' }}>
+      <div className="card form-wrap">
+        <p className="helper-text">Only accounts with the Manufacturer role can create products.</p>
+
+        {account && userRole !== 'Manufacturer' && (
+          <div className="alert alert-info">Current role is {userRole}. Switch to a Manufacturer wallet to submit this action.</div>
+        )}
+
         <form onSubmit={handleCreateProduct}>
           <div className="form-group">
             <label>Product Name</label>
@@ -46,9 +55,9 @@ function CreateProduct({ web3, account, contract }) {
             />
           </div>
 
-          {error && <div style={{ color: '#f44336', marginBottom: '1rem' }}>{error}</div>}
+          {error && <div className="alert alert-error">{error}</div>}
 
-          <button type="submit" className="btn btn-primary" disabled={loading}>
+          <button type="submit" className="btn btn-primary" disabled={loading || userRole !== 'Manufacturer'}>
             {loading ? 'Creating...' : 'Create Product'}
           </button>
         </form>

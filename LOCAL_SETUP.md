@@ -1,187 +1,124 @@
-# Local Development Setup
+# Local Development Setup (Persistent Data)
 
-Run the entire project on localhost with a Hardhat local blockchain node.
+Run the entire project on localhost with a persistent local blockchain so products, states, and history remain after restart.
 
 ## Prerequisites
 
 - Node.js v16+
 - npm
+- MetaMask
 
-## 🚀 Quick Start (3 Steps)
+## Quick Start
 
-### Step 1: Deploy Smart Contract to Local Node
+### Step 1: Start Persistent Blockchain
 
 ```bash
-# Terminal 1: Start Hardhat node
+# Terminal 1
 cd contracts
 npm install
-npm run node
+npm run node:persistent
 ```
 
-Leave this terminal running. The node will be at `http://127.0.0.1:8545`
+This runs a local chain at `http://127.0.0.1:8545` and stores chain data in `contracts/ganache-db`.
 
-### Step 2: Deploy Contract (New Terminal)
+### Step 2: Deploy or Reuse Contract
 
 ```bash
-# Terminal 2: Deploy contract
+# Terminal 2
 cd contracts
 npm run deploy:local
 ```
 
-You'll see output like:
-```
-✅ SupplyChain deployed to: 0x5FbDB2315678afccb333f8a9c3a94e1f93944d44
+Behavior of `deploy:local`:
 
-📝 Assigning roles...
-✅ Assigned Manufacturer role to: 0x70997970C51812e339D9B73b0245ad59719f5a08
-✅ Assigned Distributor role to: 0x3C44CdDdB6a900556239b2C04767eF4007a0b2B
-✅ Assigned Retailer role to: 0x14dC79964da2C08b23698B3D3cc7ca32193d9955
-```
+- First run: deploys contract + assigns roles.
+- Next runs: reuses the same deployed address if it exists on-chain.
+- Preserves existing product data and history.
 
-**Copy the contract address** (you'll need it next)
-
-### Step 3: Start Backend and Frontend (New Terminals)
+Use this only when you intentionally want a brand-new contract:
 
 ```bash
-# Terminal 3: Start Backend
+cd contracts
+npm run deploy:local:force
+```
+
+### Step 3: Start Backend and Frontend
+
+```bash
+# Terminal 3
 cd backend
 npm install
 npm run dev
 ```
 
-Backend will run on `http://localhost:5000`
+Backend URL: `http://localhost:5000`
 
 ```bash
-# Terminal 4: Start Frontend
+# Terminal 4
 cd frontend
 npm install
 npm start
 ```
 
-Frontend will run on `http://localhost:3000`
+Frontend URL: `http://localhost:3000`
 
----
+## MetaMask Network
 
-## 🔧 Configure MetaMask
+Add custom network:
 
-1. **Add Local Network to MetaMask:**
-   - Open MetaMask → Settings → Networks → Add Network
-   - Network name: `Hardhat Local`
-   - RPC URL: `http://127.0.0.1:8545`
-   - Chain ID: `31337`
-   - Currency: `ETH`
+- Network name: `Hardhat Local`
+- RPC URL: `http://127.0.0.1:8545`
+- Chain ID: `31337`
+- Currency symbol: `ETH`
 
-2. **Import Test Accounts:**
-   - When you run `npm run node`, Hardhat displays accounts with private keys
-   - In MetaMask: Account menu → Import Account
-   - Copy-paste the private key (without `0x` prefix)
-   - Repeat for Manufacturer, Distributor, and Retailer accounts
+Because `node:persistent` uses the same test mnemonic each time, imported accounts remain stable between restarts.
 
-3. **Get Test ETH:**
-   - Hardhat local accounts start with 10,000 ETH each
-   - No faucet needed!
+## Persistence Rules
 
----
+To keep all products and transaction history:
 
-## 📋 Test Accounts
+- Always run `npm run node:persistent` (not `npm run node`).
+- Do not delete `contracts/ganache-db`.
+- Use `npm run deploy:local` (reuse mode) after restart.
+- Avoid `deploy:local:force` unless you want to reset contract state.
 
-After running `npm run node`, you'll see accounts like:
-
-```
-Account #0: 0x1234... (Admin - 10000 ETH)
-Account #1: 0x5678... (Manufacturer - 10000 ETH)
-Account #2: 0x90ab... (Distributor - 10000 ETH)
-Account #3: 0xcdef... (Retailer - 10000 ETH)
-```
-
-Each account has private key displayed. Save them!
-
----
-
-## 🧪 Test the System
-
-1. **Switch to Manufacturer account** in MetaMask
-2. Go to `http://localhost:3000`
-3. Click "Connect Wallet"
-4. Create a product
-5. Switch to Distributor account
-6. Ship the product
-7. Switch to Retailer account
-8. Receive and Sell the product
-9. View the complete history!
-
----
-
-## 📊 View Transactions
-
-### Terminal Logs
-- **Hardhat Node Terminal**: Shows all transaction details
-- **Backend Terminal**: Shows API calls
-- **Frontend Console**: Browser developer tools (F12)
-
-### Check Block Explorer (Local)
-
-Visit `http://127.0.0.1:8545` for RPC status (basic)
-
----
-
-## 🔄 Redeploying
-
-If you need to restart everything:
+## Restart Without Losing Data
 
 ```bash
-# Stop all terminals (Ctrl+C)
+# Stop servers with Ctrl+C
 
-# Terminal 1: Fresh node
+# Terminal 1
 cd contracts
-npm run node
+npm run node:persistent
 
-# Terminal 2: Redeploy
+# Terminal 2
 cd contracts
 npm run deploy:local
 
-# Terminal 3 & 4: Restart backend and frontend
+# Terminal 3
+cd backend
+npm run dev
+
+# Terminal 4
+cd frontend
+npm start
 ```
 
----
+## Troubleshooting
 
-## 🐛 Troubleshooting
+- `ECONNREFUSED 127.0.0.1:8545`
+  - Start `npm run node:persistent` in `contracts`.
+- Products disappeared after restart
+  - Ensure you started `node:persistent` and did not delete `contracts/ganache-db`.
+  - Ensure you did not run `deploy:local:force`.
+- Wrong contract address
+  - Run `npm run deploy:local` again to resync `.env.local` files.
 
-| Problem | Solution |
-|---------|----------|
-| "Connection refused" | Make sure `npm run node` is running in Terminal 1 |
-| MetaMask stuck | Switch networks → back, or restart MetaMask |
-| "Wrong contract address" | Update `.env.local` values in both backend and frontend |
-| "Insufficient funds" | Use a different test account (they all have 10,000 ETH) |
-| Frontend shows "Not Connected" | Check MetaMask is on Hardhat Local network |
+## What Gets Auto-Synced
 
----
+`deploy:local` updates:
 
-## 📁 Environment Files
+- `backend/.env.local`
+- `frontend/.env.local`
 
-Auto-configured for local development:
-
-**backend/.env.local**
-```
-BLOCKCHAIN_RPC_URL=http://127.0.0.1:8545
-CONTRACT_ADDRESS=0x5FbDB2315678afccb333f8a9c3a94e1f93944d44
-PORT=5000
-```
-
-**frontend/.env.local**
-```
-REACT_APP_CONTRACT_ADDRESS=0x5FbDB2315678afccb333f8a9c3a94e1f93944d44
-REACT_APP_BACKEND_URL=http://localhost:5000
-```
-
----
-
-## ✅ You're Done!
-
-You now have a fully functional supply chain system running locally with:
-- ✅ Hardhat blockchain at `localhost:8545`
-- ✅ Smart contract deployed with pre-assigned roles
-- ✅ Backend API at `localhost:5000`
-- ✅ React frontend at `localhost:3000`
-
-Ready for development, testing, and your presentation demo!
+So backend/frontend always point to the active contract address.
